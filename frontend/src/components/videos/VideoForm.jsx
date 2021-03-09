@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as videoService from './videoService';
 import { useParams, useHistory } from 'react-router-dom';
 
-const VideoForm = () => {
+const VideoForm = ({ fetchStart, fetchClose }) => {
     const params = useParams()
     const history = useHistory()
 
@@ -25,9 +25,11 @@ const VideoForm = () => {
         if(!params.id) {
             setVideo(stateReset)
             try {
-                const res = await videoService.createVideo(video)
+                fetchStart();
+                const res = await videoService.createVideo(video);
                 if (res.status === 200) {
                     await videoService.updateUser({id: res.data._id});
+                    fetchClose();
                     e.target.classList.toggle('success');
                     setMsg('Video created successfully!');
                     setTimeout(_=> {
@@ -37,6 +39,7 @@ const VideoForm = () => {
                 } 
             } catch(err) {
                 if (err.response.status === 301) {
+                    fetchClose();
                     e.target.classList.toggle('repeated');
                     setMsg('This video already exist!');
                     setTimeout(_=> {
@@ -44,6 +47,7 @@ const VideoForm = () => {
                         setMsg('');
                     }, 5000);
                 } else {
+                    fetchClose();
                     e.target.classList.toggle('error');
                     setMsg('Oops :(. Something went wrong.');
                     console.log(err)
@@ -54,7 +58,9 @@ const VideoForm = () => {
                 }
             }
         } else {
+            fetchStart();
             await videoService.updateVideo(params.id, video)
+            fetchClose();
             history.push('/')
         };
     };

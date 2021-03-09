@@ -26,7 +26,7 @@ export const singIn:RequestHandler = async (req, res) => {
         else {
             const isMatch:boolean = await $user.comparePassword(req.body.password)
             if (isMatch) {return res.status(200).json({token: createToken($user), user: $user.id})}
-            else {return res.status(401).json({msg: 'The name or password are inconrrect'})};
+            else {return res.status(401).json({msg: 'The name or password are incorrect'})};
         };
     };
 };

@@ -1,10 +1,10 @@
 import express from 'express';
 import passport from 'passport';
+import cors from 'cors';
+import morgan from 'morgan';
 import passportMiddleware from './routes/passport';
 import videoRoutes from './routes/video.routes';
 import sessionRoutes from './routes/session.routes';
-import morgan from 'morgan';
-import cors from 'cors';
 const app = express();
 
 // Setting
@@ -14,6 +14,11 @@ app.set('port', process.env.PORT || 3500);
 
 // Middlewares
 
+/* app.use((req, res, next) => {
+    res.status(404);
+    res.redirect('/');
+    return;
+}) */
 app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());

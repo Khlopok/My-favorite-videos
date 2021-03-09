@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as sessionService from './sessionService';
 import { useParams, useHistory, Link } from 'react-router-dom';
 
-const Form = () => {
+const Form = ({ fetchStart, fetchClose }) => {
     const params = useParams()
     const history = useHistory()
 
@@ -20,13 +20,15 @@ const Form = () => {
         // If there is a parameter is login, if don't, is register
         if(!params.mode) {
             try {
+                fetchStart();
                 const res = await sessionService.signin(userData);
                 localStorage.setItem('sessionToken', res.data.token);
                 localStorage.setItem('sessionUser', res.data.user);
-                if (res.status === 200) history.push('/');
+                if (res.status === 200) fetchClose(); history.push('/');
             }
             catch(err) {
                 if (err.response.status === 401) {
+                    fetchClose();
                     e.target.classList.toggle('repeated');
                     setMsg('Password incorrect!');
                     setTimeout(_=> {
@@ -34,6 +36,7 @@ const Form = () => {
                         setMsg('');
                     }, 5000);
                 } else {
+                    fetchClose();
                     e.target.classList.toggle('error');
                     setMsg('The user does not exist.');
                     console.log(err)
@@ -45,8 +48,10 @@ const Form = () => {
             }
         } else {
             try {
+                fetchStart();
                 const res = await sessionService.signup(userData);
                 if (res.status === 201) history.push('/session');
+                fetchClose();
                 e.target.classList.toggle('success');
                     setMsg('Successfully registered!');
                     setTimeout(_=> {
@@ -56,6 +61,7 @@ const Form = () => {
             }
             catch (err) {
                 if (err.response.status === 401) {
+                    fetchClose();
                     e.target.classList.toggle('repeated');
                     setMsg('The user is already taken!');
                     setTimeout(_=> {
@@ -63,6 +69,7 @@ const Form = () => {
                         setMsg('');
                     }, 5000);
                 } else {
+                    fetchClose();
                     e.target.classList.toggle('error');
                     setMsg('Oops :(. Something went wrong.');
                     console.log(err)
@@ -78,7 +85,7 @@ const Form = () => {
     return (
         <main className="form-container">
             <form onSubmit={handleSubmit}>
-            {params.mode? <h2>Register</h2>:<h2>Wellcome</h2>}
+            {params.mode? <h2>Register</h2>:<h2>Welcome</h2>}
                 <div>
                     <input type="text" name="name" placeholder="Name" autoComplete="nope!" required autoFocus onChange={handleChange}/>
                     <input type="password" name="password" placeholder="Password" autoComplete="off" required onChange={handleChange}/>

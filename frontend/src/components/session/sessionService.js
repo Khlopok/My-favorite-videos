@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const api = 'http://192.168.0.100:3500';
+const api = 'http://localhost:3500';
 
 export const signup = async (userData) => await axios.post(`${api}/signup`, userData);
 
